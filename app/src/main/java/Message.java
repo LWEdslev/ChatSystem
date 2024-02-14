@@ -1,5 +1,7 @@
 import java.util.UUID;
 
+import org.json.JSONObject;
+
 public class Message {
     private UUID id;
     private String content;
@@ -15,6 +17,12 @@ public class Message {
         this.id = id;
         this.content = content;
         this.from_id = from_id;
+    }
+
+    public Message(JSONObject jsonMessage) {
+        this.id = UUID.fromString(jsonMessage.getString("id"));
+        this.content = jsonMessage.getString("content");
+        this.from_id = UUID.fromString(jsonMessage.getString("from-id"));
     }
 
     public UUID getID() {

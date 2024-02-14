@@ -19,6 +19,8 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.45.1.0")
 
     implementation("com.sparkjava:spark-core:2.9.3")
+
+    implementation("org.json:json:20220320")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

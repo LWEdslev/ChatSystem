@@ -1,9 +1,42 @@
 import java.util.UUID;
 import spark.Spark;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Main {
     public static void main(String[] args) {
-        Spark.get("/hello", (req, res) -> "Hello, World!");
+        Database db = new Database("sqlite.db");
+        db.resetTables();
+
+        Spark.port(8080);
+
+        Spark.get("/post-message", (req, res) -> {
+            JSONObject jsonMessage = new JSONObject(req.body());
+            Message message = new Message(jsonMessage);
+            db.postMessage(message);
+            res.status(204); // no content response
+            return "";
+        });
+
+        Spark.get("/get-all-messages", (req, res) -> {
+            // TODO implement
+            return null;
+        });
+
+        Spark.get("/get-messages-from", (req, res) -> {
+            // TODO implement
+            return null;
+        });
+
+        Spark.get("/new-user", (req, res) -> {
+            // TODO implement
+            return null;
+        });
+
+        Spark.get("/get-username", (req, res) -> {
+            // TODO implement
+            return null;
+        });
     }
 
     static void test() {
