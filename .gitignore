@@ -1,0 +1,8 @@
+/.gradle/
+/app/build/
+/frontend/node_modules/
+gradlew
+gradlew.bat
+.gitattributes
+/.vscode/
+/frontend/package-lock.json
