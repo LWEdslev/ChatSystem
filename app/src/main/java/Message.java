@@ -5,24 +5,24 @@ import org.json.JSONObject;
 public class Message {
     private UUID id;
     private String content;
-    private UUID from_id;
+    private String fromUsername;
 
-    public Message(String content, UUID from_id) {
+    public Message(String content, String fromUsername) {
         this.id = UUID.randomUUID();
         this.content = content;
-        this.from_id = from_id;
+        this.fromUsername = fromUsername;
     }
 
-    public Message(UUID id, String content, UUID from_id) {
+    public Message(UUID id, String content, String fromUsername) {
         this.id = id;
         this.content = content;
-        this.from_id = from_id;
+        this.fromUsername = fromUsername;
     }
 
     public Message(JSONObject jsonMessage) {
-        this.id = UUID.fromString(jsonMessage.getString("id"));
+        this.id = UUID.randomUUID();
         this.content = jsonMessage.getString("content");
-        this.from_id = UUID.fromString(jsonMessage.getString("from-id"));
+        this.fromUsername = jsonMessage.getString("fromUsername");
     }
 
     public UUID getID() {
@@ -33,17 +33,17 @@ public class Message {
         return content;
     }
 
-    public UUID getFromID() {
-        return from_id;
-    }
-
     @Override
     public String toString() {
-        return "Message {" +
-                "id=" + id +
-                ", content='" + content + '\'' +
-                ", from_id=" + from_id +
-                '}';
+        return "Message {\n" +
+                "  id = " + id +
+                "\n  content = '" + content + '\'' +
+                "\n  from = " + fromUsername +
+                "\n}";
+    }
+
+    public String getFromUsername() {
+        return this.fromUsername;
     }
 }
 
