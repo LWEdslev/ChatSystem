@@ -24,13 +24,8 @@ async function postMessage(message, username, setMessagesState) {
 async function getAllMessages() {
   try {
     const response = await fetch('/get-all-messages');
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch messages');
-    }
-
+    if (!response.ok) { throw new Error('Failed to fetch messages'); }
     const messages = await response.json();
-    console.log('All messages:', messages);
     return messages;
   } catch (error) {
     console.error('Error fetching messages:', error.message);
@@ -41,7 +36,7 @@ async function getAllMessages() {
 function jsonMessageToChatComponent(jsonMessage, username) {
   const { ID, content, fromUsername } = jsonMessage;
   if (fromUsername === username) {
-    return <ChatRight key={ID}>
+    return <ChatRight>
       <ChatBubble from={fromUsername} message={content} />
     </ChatRight>
   }
@@ -71,24 +66,23 @@ function ChatLeft({ children }) {
 }
 
 function ChatRight({ children }) {
-  const rightChildren = React.Children.map(children, child =>
-    React.cloneElement(child, { type: "right" })
-  )
+  const rightChildren = React.Children.map(children, child => React.cloneElement(child, { type: "right" }))
   return (<div className={`chat flex justify-end`}>{rightChildren}</div>)
 }
 
 function SendLine({ username, setMessagesState }) {
   const [messageState, setMessageState] = useState('');
+  const handleKeyPress = (event) => { if (event.key === 'Enter' && messageState.length > 0) { sendMessage(); } };
 
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-      sendMessage();
-    }
-  };
+  useEffect(() => {
+    document.addEventListener('keypress', handleKeyPress);
+    return () => { document.removeEventListener('keypress', handleKeyPress); }
+  })
 
   const sendMessage = () => {
     postMessage(messageState, username, setMessageState).then(() => setMessageState(''));
     getAllMessages().then((messages) => setMessagesState(messages));
+    setMessageState('');
   };
 
   return (
@@ -100,14 +94,8 @@ function SendLine({ username, setMessagesState }) {
           className="join-item input input-bordered border-2 w-full h-full text-2xl"
           value={messageState}
           onChange={(e) => setMessageState(e.target.value)}
-          onKeyPress={handleKeyPress}
         />
-        <button
-          className='btn h-full join-item  h-full btn-primary text-xl'
-          onClick={sendMessage}
-        >
-          Send
-        </button>
+        <button className='btn h-full join-item  h-full btn-primary text-xl' onClick={sendMessage}>Send</button>
       </div>
     </div>
   );
@@ -124,13 +112,13 @@ function Title() {
 function ChatContainer({ children }) {
   const divRef = useRef(null);
 
-  useEffect(() => {
-    divRef.current.scrollIntoView({ behavior: 'smooth' });
-  });
+  useEffect(() => divRef.current.scrollIntoView({ behavior: 'smooth' }));
 
   return (
     <div className="flex justify-center overflow-hidden h-full ">
-      <div className="flex flex-col flex-col-reverse p-1 mt-1 overflow-y-auto rounded-2xl w-full h-full border border-2 border-primary" style={{ maxHeight: 'calc(100vh - 140px)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div
+        className="flex flex-col flex-col-reverse p-1 mt-1 overflow-y-auto rounded-2xl w-full h-full border border-2 border-primary"
+        style={{ maxHeight: 'calc(100vh - 140px)', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {React.Children.toArray(children).reverse()}
       </div>
       <div ref={divRef}></div>
@@ -138,16 +126,12 @@ function ChatContainer({ children }) {
   )
 }
 
-function MainComponent({ children, username, setMessagesState}) {
-
+function MainComponent({ children, username, setMessagesState }) {
   return (
     <div className="flex flex-col overflow-hidden h-screen w-3/4 mx-auto">
-      <Title />
+      <Title/>
       <ChatContainer>{children}</ChatContainer>
-      <SendLine 
-        username={username}
-        setMessagesState={setMessagesState}
-      />
+      <SendLine username={username} setMessagesState={setMessagesState}/>
     </div>
   )
 }
@@ -162,15 +146,11 @@ function Login({ usernameState, setUsernameState, hasLoggedInState, setHasLogged
       getAllMessages().then((messages) => setMessagesState(messages));
       document.removeEventListener('keypress', handleKeyPress);
       setHasLoggedInState(true)
-    } 
+    }
   }
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') { setLoginStateTrue(); }
-  };
-
+  const handleKeyPress = (e) => { if (e.key === 'Enter') { setLoginStateTrue(); }};
   document.addEventListener('keypress', handleKeyPress);
-
   if (hasLoggedInState === true) { return null }
 
   return (
@@ -218,6 +198,4 @@ function ChatBox() {
     </MainComponent >
   );
 }
-
-
 export default ChatBox;
