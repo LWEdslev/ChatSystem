@@ -1,5 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
 
+async function getMessagesAfter(id) {
+  try {
+    const response = await fetch(`/get-messages-after/${id}`);
+    if (!response.ok) { throw new Error('Failed to fetch messages'); }
+    const messages = await response.json();
+    return messages;
+  } catch (error) {
+    console.error('Error fetching messages:', error.message);
+    return [];
+  }
+}
+
+function updateMessagesState(messagesState, setMessagesState) {
+  const latestID = messagesState[messagesState.length - 1].ID
+  getMessagesAfter(latestID).then((messages) => setMessagesState(messages));
+}
+
+
 async function postMessage(message, username, setMessagesState) {
   try {
     const response = await fetch('/post-message', {
@@ -14,8 +32,6 @@ async function postMessage(message, username, setMessagesState) {
       throw new Error('Failed to post message');
     }
     console.log('Message posted successfully');
-    const messages = await getAllMessages();
-    setMessagesState(messages);
   } catch (error) {
     console.error('Error posting message:', error.message);
   }
@@ -70,7 +86,7 @@ function ChatRight({ children }) {
   return (<div className={`chat flex justify-end`}>{rightChildren}</div>)
 }
 
-function SendLine({ username, setMessagesState }) {
+function SendLine({ username, setMessagesState, messagesState }) {
   const [messageState, setMessageState] = useState('');
   const handleKeyPress = (event) => { if (event.key === 'Enter' && messageState.length > 0) { sendMessage(); } };
 
@@ -81,7 +97,7 @@ function SendLine({ username, setMessagesState }) {
 
   const sendMessage = () => {
     postMessage(messageState, username, setMessageState).then(() => setMessageState(''));
-    getAllMessages().then((messages) => setMessagesState(messages));
+    updateMessagesState(messagesState, setMessagesState)
     setMessageState('');
   };
 
@@ -126,12 +142,12 @@ function ChatContainer({ children }) {
   )
 }
 
-function MainComponent({ children, username, setMessagesState }) {
+function MainComponent({ children, username, setMessagesState, messagesState }) {
   return (
     <div className="flex flex-col overflow-hidden h-screen w-3/4 mx-auto">
       <Title/>
       <ChatContainer>{children}</ChatContainer>
-      <SendLine username={username} setMessagesState={setMessagesState}/>
+      <SendLine username={username} setMessagesState={setMessagesState} messagesState={messagesState} />
     </div>
   )
 }
@@ -145,7 +161,7 @@ function Login({ usernameState, setUsernameState, hasLoggedInState, setHasLogged
     if (usernameState !== '') {
       getAllMessages().then((messages) => setMessagesState(messages));
       document.removeEventListener('keypress', handleKeyPress);
-      setHasLoggedInState(true)
+      setHasLoggedInState(true);
     }
   }
 
@@ -179,14 +195,14 @@ function ChatBox() {
   useEffect(() => {
     if (hasLoggedInState === true) {
       const interval = setInterval(() => {
-        getAllMessages().then((messages) => setMessagesState(messages));
+        updateMessagesState(messagesState, setMessagesState).then((messages) => setMessagesState(messages));
       }, 500);
       return () => clearInterval(interval);
     }
   }, [hasLoggedInState]);
 
   return (
-    <MainComponent username={usernameState} setMessagesState={setMessagesState}>
+    <MainComponent username={usernameState} setMessagesState={setMessagesState} messagesState={messagesState}>
       <Login
         usernameState={usernameState}
         setUsernameState={setUsernameState}

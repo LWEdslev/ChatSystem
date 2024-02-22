@@ -5,6 +5,7 @@ import java.util.UUID;
 import spark.Spark;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,6 +15,8 @@ public class Main {
     static void runRestAPI() {
         Database db = new Database("sqlite.db");
         db.resetTables();
+
+        System.out.println("Server started on http://localhost:8080/");
 
         Spark.port(8080);
 
@@ -43,6 +46,16 @@ public class Main {
             }
             return messages;
         });
+
+        Spark.get("/get-messages-after/:id", (req, res) -> {
+            UUID id = UUID.fromString(req.params(":id"));
+            System.out.println("Getting messages after " + id);
+            JSONArray messages = new JSONArray();
+            for (Message message : db.getMessagesAfter(id)) {
+                messages.put(new JSONObject(message));
+            }
+            return messages;
+        });
     }
 
     static void test() {
@@ -54,4 +67,24 @@ public class Main {
         
         System.out.println(db.getAllMessages());
     } 
+
+    static void test2() {
+        Database db = new Database("sqlite.db");
+        db.resetTables();
+
+        sendMessages(db, 10);
+
+        List<Message> messages = db.getAllMessages();
+
+        Message middleMessage = messages.get(5);
+        List<Message> messagesAfter = db.getMessagesAfter(middleMessage.getID());
+
+        assert(messagesAfter.size() == 4);
+    }
+
+    static void sendMessages(Database db, int numberOfMessages) {
+        for (int i = 0; i < numberOfMessages; i++) {
+            db.postMessage(new Message("Dette er besked nr. " + i, "Alice"));
+        }
+    }
 }
