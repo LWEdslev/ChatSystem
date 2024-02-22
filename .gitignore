@@ -1,5 +1,5 @@
 /.gradle/
-/app/build/
+/backend/build/
 /frontend/node_modules/
 gradlew
 gradlew.bat
