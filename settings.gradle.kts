@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "ChatSystem"
-include("app")
+include("backend")

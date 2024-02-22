@@ -1,4 +1,4 @@
-FROM gradle:jdk17 AS build
+FROM gradle:jdk17 AS backend-build
 
 WORKDIR /app
 
@@ -18,7 +18,7 @@ FROM gradle:jdk17 AS final
 
 WORKDIR /app
 
-COPY --from=build /app /app
+COPY --from=backend-build /app /app
 
 COPY --from=frontend-build /app/frontend/build /app/frontend/build
 
