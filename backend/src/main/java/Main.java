@@ -30,7 +30,6 @@ public class Main {
             System.out.println(e);
         } 
 
-
         Spark.post("/post-message", (req, res) -> {
             JSONObject jsonMessage = new JSONObject(req.body());
             Message message = new Message(jsonMessage);

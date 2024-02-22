@@ -13,8 +13,13 @@ async function getMessagesAfter(id) {
 }
 
 function updateMessagesState(messagesState, setMessagesState) {
-  const latestID = messagesState[messagesState.length - 1].ID
-  getMessagesAfter(latestID).then((messages) => setMessagesState(messages));
+  const latestID = (messagesState.length > 0) ? messagesState[messagesState.length - 1].ID : -1;
+  if (latestID === -1) { 
+    getAllMessages().then((messages) => setMessagesState(messages));
+   } else {
+    console.log('latestID:', latestID);
+    getMessagesAfter(latestID).then((messages) => setMessagesState(messages));
+  }
 }
 
 
@@ -195,7 +200,7 @@ function ChatBox() {
   useEffect(() => {
     if (hasLoggedInState === true) {
       const interval = setInterval(() => {
-        updateMessagesState(messagesState, setMessagesState).then((messages) => setMessagesState(messages));
+        updateMessagesState(messagesState, setMessagesState)
       }, 500);
       return () => clearInterval(interval);
     }
